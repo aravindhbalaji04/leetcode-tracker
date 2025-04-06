@@ -1,18 +1,21 @@
 from flask import Flask, render_template, request, jsonify
 import json
 from datetime import datetime
-from submissions import get_recent_submissions
 from apscheduler.schedulers.background import BackgroundScheduler
+from update_users import update_user_data
+from submissions import get_recent_submissions
 import csv
 from datetime import datetime
 import os
-from flask_cors import CORS
+
 
 app = Flask(__name__)
-CORS(app)
-
 DATA_FILE = 'users.json'
 CSV_FILE = 'daily_data.csv'
+
+
+def reset_daily_submissions():
+    update_user_data()  # ✅ Use this function instead
 
 def log_daily_submission(username, count):
     today = datetime.now().strftime("%Y-%m-%d")
@@ -46,7 +49,6 @@ def add_user():
     username = request.form['username']
     users = load_users()
     submissions = get_recent_submissions(username)
-
     if submissions:
         users[username] = {
             "lastSubmission": submissions[0]["title"],
@@ -55,7 +57,7 @@ def add_user():
         }
         save_users(users)
         return jsonify({"success": True, "message": "User added"})
-    return jsonify({"success": False, "message": "Error fetching user submissions"})
+    return jsonify({"success": False, "message": "User's account is Private"})
 
 @app.route('/get_users')
 def get_users():
@@ -80,16 +82,6 @@ def get_users():
     return jsonify(results)
 
 # Daily Reset at 12AM
-def reset_daily_submissions():
-    users = load_users()
-    for username in users:
-        submissions = get_recent_submissions(username)
-        if submissions:
-            users[username]["lastSubmission"] = submissions[0]["title"]
-            users[username]["lastCheck"] = str(datetime.now().date())
-            users[username]["problemsSolvedToday"] = 0
-    save_users(users)
-    print("Daily reset done.")
 
 # Scheduler Setup
 scheduler = BackgroundScheduler()
