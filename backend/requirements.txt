@@ -1,0 +1,6 @@
+Flask
+requests
+gunicorn
+schedule
+apscheduler
+flask_cors
