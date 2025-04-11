@@ -7,7 +7,7 @@ from datetime import datetime
 import requests
 
 app = Flask(__name__)
-DATABASE_URL = os.getenv("postgresql://leetcode_db_user:vBTinZ7ZoiM6MbQZVlj4RiB0r6L5DWAL@dpg-cvsgd6i4d50c738ggsqg-a/leetcode_db")
+DATABASE_URL = os.getenv("postgresql://leetcode_db_user:vBTinZ7ZoiM6MbQZVlj4RiB0r6L5DWAL@dpg-cvsgd6i4d50c738ggsqg-a.oregon-postgres.render.com/leetcode_db")
 
 def get_db_conn():
     return psycopg2.connect(DATABASE_URL)
