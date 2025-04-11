@@ -1,7 +1,7 @@
 # app.py
 import os
 import psycopg2
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 import requests
@@ -24,9 +24,9 @@ def init_db():
         """)
         conn.commit()
 
-
-app = Flask(__name__)
-DB_NAME = "users.db"
+@app.route("/")
+def home():
+    return send_from_directory(".", "index.html")
 
 # --- Utility to get latest LeetCode submissions ---
 def get_recent_submission_count(username):
