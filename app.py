@@ -1,8 +1,29 @@
 # app.py
+import os
+import psycopg2
 from flask import Flask, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
-import requests, sqlite3
+import requests
+
+app = Flask(__name__)
+DATABASE_URL = os.getenv("postgresql://leetcode_db_user:vBTinZ7ZoiM6MbQZVlj4RiB0r6L5DWAL@dpg-cvsgd6i4d50c738ggsqg-a/leetcode_db")
+
+def get_db_conn():
+    return psycopg2.connect(DATABASE_URL)
+
+def init_db():
+    with get_db_conn() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                username TEXT PRIMARY KEY,
+                last_title TEXT,
+                today_count INT
+            )
+        """)
+        conn.commit()
+
 
 app = Flask(__name__)
 DB_NAME = "users.db"
@@ -25,21 +46,21 @@ def get_recent_submission_count(username):
 
 # --- Init DB ---
 def init_db():
-    with sqlite3.connect(DB_NAME) as conn:
+    with get_db_conn(DB_NAME) as conn:
         cur = conn.cursor()
         cur.execute('''CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, last_title TEXT, today_count INT)''')
         conn.commit()
 
 @app.route("/api/users", methods=["GET"])
 def get_users():
-    with sqlite3.connect(DB_NAME) as conn:
+    with get_db_conn(DB_NAME) as conn:
         cur = conn.cursor()
         cur.execute("SELECT * FROM users")
         users = cur.fetchall()
     return jsonify(users)
 
 def update_user_data():
-    with sqlite3.connect(DB_NAME) as conn:
+    with get_db_conn(DB_NAME) as conn:
         cur = conn.cursor()
         cur.execute("SELECT username, last_title FROM users")
         users = cur.fetchall()
