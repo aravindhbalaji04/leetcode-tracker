@@ -1,0 +1,33 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LeetCode Daily Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-8">
+  <h1 class="text-4xl font-bold mb-6">🔥 LeetCode Daily Tracker</h1>
+  <div id="users" class="grid gap-4"></div>
+
+  <script>
+    async function loadUsers() {
+      const res = await fetch("/api/users");
+      const data = await res.json();
+      const container = document.getElementById("users");
+      container.innerHTML = "";
+      data.forEach(([username, _, todayCount]) => {
+        container.innerHTML += `
+          <div class="p-4 bg-gray-800 rounded-lg shadow-lg">
+            <h2 class="text-xl font-semibold">${username}</h2>
+            <p>✅ Solved Today: <strong>${todayCount}</strong></p>
+          </div>
+        `;
+      });
+    }
+
+    loadUsers();
+    setInterval(loadUsers, 10000); // auto-refresh every 10s
+  </script>
+</body>
+</html>
